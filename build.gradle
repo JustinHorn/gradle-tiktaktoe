@@ -1,0 +1,101 @@
+plugins {
+    id 'java'
+}
+
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+import groovy.swing.SwingBuilder
+
+ext.printField = { field ->
+    for(int i = 0; i < 3; i++) {
+        println "-------"
+        for(int j = 0; j < 3; j++) {
+            print "|"
+            print field.getAt(i*3+j)
+        }
+        println "|"
+    }
+    println "-------"
+}
+ext.pickNumber = {  ->
+    var number
+    new SwingBuilder().edt {
+        dialog(modal: true,
+                title: 'Enter Fieldnumber',
+                alwaysOnTop: true,
+                resizable: false,
+                locationRelativeTo: null,
+                pack: true,
+                show: true
+        ) {
+            vbox {
+                label(text: "Please enter field number")
+                input = textField()
+                button(defaultButton: true, text: 'OK', actionPerformed: {
+                    number = input.text;
+                    dispose();
+                })
+            }
+        }
+    }
+    return number.toInteger()
+}
+
+ext.pickNumber = { ->
+    var number
+    new SwingBuilder().edt {
+        dialog(modal: true,
+                title: 'Enter Fieldnumber',
+                alwaysOnTop: true,
+                resizable: false,
+                locationRelativeTo: null,
+                pack: true,
+                show: true
+        ) {
+            vbox {
+                label(text: "Please enter field number")
+                input = textField()
+                button(defaultButton: true, text: 'OK', actionPerformed: {
+                    number = input.text;
+                    dispose();
+                })
+            }
+        }
+    }
+    return number.toInteger()
+}
+
+ext.getWinner = { field ->
+    for (int i = 0; i < 3; i++) {
+        if (field.getAt(i*3) != '-' && field.getAt(i*3) == field.getAt(i*3+1) && field.getAt(i*3+1) == field.getAt(i*3+2)) {
+            return field.getAt(0)
+        }
+        if (field.getAt(i) != '-' && field.getAt(i) == field.getAt(i+3) && field.getAt(i+3) == field.getAt(i+6)) {
+            return field.getAt(0)
+        }
+    }
+    if (field.getAt(0) != '-' && field.getAt(0) == field.getAt(4) && field.getAt(4) == field.getAt(8)) {
+        return field.getAt(0)
+    }
+    if (field.getAt(2) != '-' && field.getAt(2) == field.getAt(4) && field.getAt(4) == field.getAt(6)) {
+        return field.getAt(4)
+    }
+    return '-'
+}
+
+task tikTakToe {
+    var startField = "---------"
+    for (int i = 0; i < 9; i++) {
+        var number =  pickNumber()
+        startField = startField.substring(0,number) +(i%2 ==0?"X":"O")+ startField.substring(number+1,startField.length())
+        printField startField
+        var winner = getWinner startField
+        if (winner != '-') {
+            println winner+" has won!"
+            break;
+        }
+    }
+    println "Game over!"
+}
+
